@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Dungeon</title>
+</head>
+
+<body>
+    <canvas id="Canvas" width="2000" height="2000">
+
+    </canvas>
+    <script>
+        var canvas = document.getElementById("Canvas");
+        const ctx = canvas.getContext("2d");
+        var folhas = [];
+        ctx.fillStyle = "#614d35";
+
+
+        var regiao = {
+            x: 50,
+            y: 50,
+            largura: 1500,
+            altura: 1500
+        };
+
+        function desenharRegiao(regiao) {
+            ctx.fillRect(regiao.x, regiao.y, regiao.largura, regiao.altura);
+        }
+
+        function cortarRegiao(regiao) {
+
+            if (regiao.largura <= 500 || regiao.altura <= 500) {
+
+                return { regiao: regiao, esquerda: null, direita: null };
+
+            }
+            else {
+
+                var corte = Math.random() * 0.4 + 0.3;
+
+                if (Math.random() < 0.5) {
+
+
+                    var parteEsquerda = {
+                        x: regiao.x,
+                        y: regiao.y,
+                        largura: regiao.largura * corte,
+                        altura: regiao.altura
+                    };
+                    var parteDireita = {
+                        x: parteEsquerda.largura + regiao.x,
+                        y: regiao.y,
+                        largura: regiao.largura - parteEsquerda.largura,
+                        altura: regiao.altura
+                    }
+                    var separacao = [parteEsquerda, parteDireita];
+
+                    var filhoEsquerdo = cortarRegiao(separacao[0]);
+                    var filhoDireito = cortarRegiao(separacao[1]);
+                    return { regiao: regiao, esquerda: filhoEsquerdo, direita: filhoDireito };
+
+
+                }
+                else {
+
+
+                    var parteCima = {
+                        x: regiao.x,
+                        y: regiao.y,
+                        largura: regiao.largura,
+                        altura: regiao.altura * corte
+                    };
+                    var parteBaixo = {
+                        x: regiao.x,
+                        y: parteCima.altura + regiao.y,
+                        largura: regiao.largura,
+                        altura: regiao.altura - parteCima.altura
+                    }
+                    var separacao = [parteCima, parteBaixo];
+
+                    var filhoEsquerdo = cortarRegiao(separacao[0]);
+                    var filhoDireito = cortarRegiao(separacao[1]);
+                    return { regiao: regiao, esquerda: filhoEsquerdo, direita: filhoDireito };
+
+
+                }
+                return separacao;
+            }
+        }
+        var arvore = cortarRegiao(regiao);
+
+        function pegarFolhas(no) {
+            if (no.esquerda === null && no.direita === null) {
+                return [no.regiao];
+            }
+            var folhasEsquerda = pegarFolhas(no.esquerda);
+            var folhasDireita = pegarFolhas(no.direita);
+            return folhasEsquerda.concat(folhasDireita);
+        }
+
+        var folhas = pegarFolhas(arvore);
+
+        function gerarSala(regiao) {
+            var sala = {
+                x: regiao.x + 30,
+                y: regiao.y + 30,
+                largura: regiao.largura - 60,
+                altura: regiao.altura - 60
+            }
+
+            return sala
+        }
+
+        function pegarCentro(no){
+            var centroX;
+            var centroY;
+            var centro = [];
+            var sala = gerarSala(no.regiao)
+            if(no.esquerda === null && no.direita === null){
+                centroX = (sala.x + sala.largura /2)
+                centroY = (sala.y + sala.altura /2)
+                centro = [centroX, centroY];
+                return centro;
+            }
+            else{
+                return pegarCentro(no.esquerda)
+            }
+        }
+
+        function conectarCorredores(no) {
+            if (no.esquerda === null && no.direita === null) return;
+
+            var centroEsquerdo = pegarCentro(no.esquerda);
+            var centroDireito = pegarCentro(no.direita);
+
+            var x1 = centroEsquerdo[0], y1 = centroEsquerdo[1];
+            var x2 = centroDireito[0], y2 = centroDireito[1];
+
+            ctx.fillStyle = "#ad9372";
+            ctx.fillRect(Math.min(x1,x2), y1, Math.abs(x2-x1), 60);
+            ctx.fillRect(x2, Math.min(y1,y2), 60, Math.abs(y2-y1));
+
+            conectarCorredores(no.esquerda);
+            conectarCorredores(no.direita);
+        }
+
+
+        conectarCorredores(arvore)
+        for (i = 0; i < folhas.length; i++) {
+            ctx.fillStyle = "#ad9372";
+            var sala = gerarSala(folhas[i]);
+            desenharRegiao(sala);
+        }
+
+    </script>
+</body>
+
+</html>
