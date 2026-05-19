@@ -15,14 +15,16 @@
         var canvas = document.getElementById("Canvas");
         const ctx = canvas.getContext("2d");
         var folhas = [];
-        ctx.fillStyle = "#614d35";
+
+        ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, 2000, 2000);
 
 
         var regiao = {
-            x: 50,
-            y: 50,
-            largura: 1500,
-            altura: 1500
+            x: 0,
+            y: 0,
+            largura: 2000,
+            altura: 2000
         };
 
         function desenharRegiao(regiao) {
@@ -146,7 +148,7 @@
             conectarCorredores(no.direita);
         }
 
-
+        desenharRegiao(regiao)
         conectarCorredores(arvore)
         for (i = 0; i < folhas.length; i++) {
             ctx.fillStyle = "#ad9372";
