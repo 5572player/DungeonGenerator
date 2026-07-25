@@ -140,7 +140,7 @@
             var x1 = centroEsquerdo[0], y1 = centroEsquerdo[1];
             var x2 = centroDireito[0], y2 = centroDireito[1];
 
-            ctx.fillStyle = "#ad9372";
+            ctx.fillStyle = "red";
             ctx.fillRect(Math.min(x1,x2), y1, Math.abs(x2-x1), 60);
             ctx.fillRect(x2, Math.min(y1,y2), 60, Math.abs(y2-y1));
 
@@ -149,13 +149,14 @@
         }
 
         desenharRegiao(regiao)
-        conectarCorredores(arvore)
+        
         for (i = 0; i < folhas.length; i++) {
             ctx.fillStyle = "#ad9372";
             var sala = gerarSala(folhas[i]);
             desenharRegiao(sala);
         }
-
+        conectarCorredores(arvore)
+        
     </script>
 </body>
 
